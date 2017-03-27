@@ -1,6 +1,11 @@
 editable-table
 =================
 
+What this fork changes:
+* Changed movement keys so as not to change cell position when in edit mode but to move within the edit field
+* Added support for 'wall' class for cells that can't be edited/moved to.
+* Added minimal sample
+
 This tiny (3KB, < 120 lines) jQuery plugin turns any table into an editable spreadsheet. Here are the key features:
 
 * No magic - works on a normal HTML table (so you can plug it in into any web
