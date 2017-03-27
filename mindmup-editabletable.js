@@ -14,6 +14,13 @@ $.fn.editableTableWidget = function (options) {
 			active,
 			inedit = false,
 			showEditor = function (select) {
+				if ( typeof(select) == 'object' && 'originalEvent' in select) {
+					var td = $(select['originalEvent']['srcElement'])
+					if (td.attr('class') == 'wall') {
+						td.blur();
+						return;
+					}
+				}
 				inedit = true;
 				active = element.find('td:focus');
 				if (active.length) {
