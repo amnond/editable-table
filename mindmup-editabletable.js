@@ -12,7 +12,9 @@ $.fn.editableTableWidget = function (options) {
 			element = $(this),
 			editor = activeOptions.editor.css('position', 'absolute').hide().appendTo(element.parent()),
 			active,
+			inedit = false,
 			showEditor = function (select) {
+				inedit = true;
 				active = element.find('td:focus');
 				if (active.length) {
 					editor.val(active.text())
@@ -42,14 +44,30 @@ $.fn.editableTableWidget = function (options) {
 				}
 			},
 			movement = function (element, keycode) {
+				if (inedit) {
+					return [];
+				}
 				if (keycode === ARROW_RIGHT) {
-					return element.next('td');
+					return element.nextAll("td").not(".wall").first();
+					//return element.next('td');
 				} else if (keycode === ARROW_LEFT) {
-					return element.prev('td');
+					return element.prevAll("td").not(".wall").first();
+					//return element.prev('td');
 				} else if (keycode === ARROW_UP) {
-					return element.parent().prev().children().eq(element.index());
+					// too lazy finding the first non wall td in column
+					var td = element.parent().prev().children().eq(element.index());
+					if (td.attr("class") == "wall") {
+						return [];
+					}
+					return td;
+					//return element.parent().prev().children().eq(element.index());
 				} else if (keycode === ARROW_DOWN) {
-					return element.parent().next().children().eq(element.index());
+					var td = element.parent().next().children().eq(element.index());
+					if (td.attr("class") == "wall") {
+						return [];
+					}
+					return td;
+					//return element.parent().next().children().eq(element.index());
 				}
 				return [];
 			};
@@ -58,18 +76,21 @@ $.fn.editableTableWidget = function (options) {
 			editor.hide();
 		}).keydown(function (e) {
 			if (e.which === ENTER) {
+				inedit = false;
 				setActiveText();
 				editor.hide();
 				active.focus();
 				e.preventDefault();
 				e.stopPropagation();
 			} else if (e.which === ESC) {
+				inedit = false;
 				editor.val(active.text());
 				e.preventDefault();
 				e.stopPropagation();
 				editor.hide();
 				active.focus();
 			} else if (e.which === TAB) {
+				inedit = false;
 				active.focus();
 			} else if (this.selectionEnd - this.selectionStart === this.value.length) {
 				var possibleMove = movement(active, e.which);
@@ -97,8 +118,10 @@ $.fn.editableTableWidget = function (options) {
 			if (possibleMove.length > 0) {
 				possibleMove.focus();
 			} else if (e.which === ENTER) {
+				inedit = false;
 				showEditor(false);
 			} else if (e.which === 17 || e.which === 91 || e.which === 93) {
+				inedit = true;
 				showEditor(true);
 				prevent = false;
 			} else {
